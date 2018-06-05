@@ -1,12 +1,13 @@
 import pygame
 from pygame.locals import *
-import numpy
+from tkinter import *
+from tkinter import messagebox
 
 pygame.init()
 display_width = 600
 display_height = 600
-rows = 10
-columns = 10
+rows = 4
+columns = 4
 y_cell_size = int(display_height / rows)
 x_cell_size = int(display_width / columns)
 screen = pygame.display.set_mode((display_width, display_height))
@@ -71,14 +72,22 @@ class Grid:
                     x_center = x * x_cell_size + int(x_cell_size / 2)
                     y_center = y * y_cell_size + int(y_cell_size / 2)
                     if Grid.grid[y][x].atoms == 1:
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center, y_center), 10)
+                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center, y_center),
+                                           int(x_cell_size * 0.1))
                     elif Grid.grid[y][x].atoms == 2:
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center - 10, y_center), 10)
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center + 10, y_center), 10)
+                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center - int(x_cell_size * 0.1), y_center),
+                                           int(x_cell_size * 0.1))
+                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center + int(x_cell_size * 0.1), y_center),
+                                           int(x_cell_size * 0.1))
                     elif Grid.grid[y][x].atoms == 3:
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center - 10, y_center - 2), 10)
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center + 10, y_center - 2), 10)
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center, y_center + 10), 10)
+                        pygame.draw.circle(screen, Grid.grid[y][x].color,
+                                           (x_center - int(x_cell_size * 0.1), y_center - int(x_cell_size/1.2 * 0.1)),
+                                           int(x_cell_size * 0.1))
+                        pygame.draw.circle(screen, Grid.grid[y][x].color,
+                                           (x_center + int(x_cell_size * 0.1), y_center - int(x_cell_size/1.2 * 0.1)),
+                                           int(x_cell_size * 0.1))
+                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center, y_center + int(x_cell_size/1.2 * 0.1)),
+                                           int(x_cell_size * 0.1))
 
 
 def toggle_turn():
@@ -102,13 +111,22 @@ def burst(cell):
 
 
 def check_winner():
-    color = Color.shade[turn]
+    player1_score = 0
+    player2_score = 0
     for y in range(rows):
         for x in range(columns):
-            if Grid.grid[y][x].color == color:
-                continue
-            else:
-                return 'NOONE'
+            if Grid.grid[y][x].color:
+                if Grid.grid[y][x].color == Color.shade[turn]:
+                    player1_score = player1_score + 1
+                else:
+                    player2_score = player2_score + 1
+
+    if player1_score >= 2 and player2_score == 0:
+        return turn
+    elif player2_score >= 2 and player1_score == 0:
+        return next_turn()
+    else:
+        return -1
 
 
 def add_atom(position):
@@ -150,3 +168,12 @@ if __name__ == '__main__':
     while True:
         event_handler()
         pygame.display.update()
+
+        result = check_winner()
+        if result == -1:
+            continue
+        else:
+            Tk().wm_withdraw()  # to hide the main window
+            player = 'BLUE' if turn == 0 else 'RED'
+            messagebox.showinfo('Game Over', 'Player {} Wins'.format(player))
+            break
