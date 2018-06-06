@@ -2,6 +2,7 @@
 Chain reaction implementation
 
 Simple implementation of Chain Reaction Game in **Python 3**
+
 This is a 2 player game and grid can be customized
 
 ## Prerequisite
