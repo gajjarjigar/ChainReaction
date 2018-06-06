@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from tkinter import *
 from tkinter import messagebox
+import random
 
 pygame.init()
 display_width = 600
@@ -12,7 +13,7 @@ y_cell_size = int(display_height / rows)
 x_cell_size = int(display_width / columns)
 screen = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Chain Reaction - Jigar Gajjar')
-
+fps_clock = pygame.time.Clock()
 # columns ==> x
 # rows ==> y
 
@@ -72,21 +73,38 @@ class Grid:
                     x_center = x * x_cell_size + int(x_cell_size / 2)
                     y_center = y * y_cell_size + int(y_cell_size / 2)
                     if Grid.grid[y][x].atoms == 1:
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center, y_center),
+                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center + xrandom, y_center + yrandom),
                                            int(x_cell_size * 0.1))
                     elif Grid.grid[y][x].atoms == 2:
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center - int(x_cell_size * 0.1), y_center),
+                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        pygame.draw.circle(screen, Grid.grid[y][x].color,
+                                           (x_center - int(x_cell_size * 0.1) + xrandom, y_center + yrandom),
                                            int(x_cell_size * 0.1))
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center + int(x_cell_size * 0.1), y_center),
+                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        pygame.draw.circle(screen, Grid.grid[y][x].color,
+                                           (x_center + int(x_cell_size * 0.1) + xrandom, y_center + yrandom),
                                            int(x_cell_size * 0.1))
                     elif Grid.grid[y][x].atoms == 3:
+                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
                         pygame.draw.circle(screen, Grid.grid[y][x].color,
-                                           (x_center - int(x_cell_size * 0.1), y_center - int(x_cell_size/1.2 * 0.1)),
+                                           (x_center - int(x_cell_size * 0.1) + xrandom,
+                                            y_center - int(x_cell_size / 1.2 * 0.1) + yrandom),
                                            int(x_cell_size * 0.1))
+                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
                         pygame.draw.circle(screen, Grid.grid[y][x].color,
-                                           (x_center + int(x_cell_size * 0.1), y_center - int(x_cell_size/1.2 * 0.1)),
+                                           (x_center + int(x_cell_size * 0.1) + xrandom,
+                                            y_center - int(x_cell_size / 1.2 * 0.1) + yrandom),
                                            int(x_cell_size * 0.1))
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center, y_center + int(x_cell_size/1.2 * 0.1)),
+                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
+                        pygame.draw.circle(screen, Grid.grid[y][x].color,
+                                           (x_center + xrandom, y_center + int(x_cell_size / 1.2 * 0.1) + yrandom),
                                            int(x_cell_size * 0.1))
 
 
@@ -158,7 +176,6 @@ def event_handler():
             pygame.quit()
             quit()
         elif event.type == MOUSEBUTTONUP:
-            pygame.display.set_caption('Chain Reaction - Jigar Gajjar {}'.format(pygame.mouse.get_pos()))
             add_atom(pygame.mouse.get_pos())
 
 
@@ -166,11 +183,13 @@ if __name__ == '__main__':
     grid_object = Grid()
     grid_object.make(Color.shade[turn])
     while True:
+        fps_clock.tick(30)
         event_handler()
         pygame.display.update()
-
         result = check_winner()
         if result == -1:
+            Grid.make(Color.shade[turn])
+            Grid.draw_atoms()
             continue
         else:
             Tk().wm_withdraw()  # to hide the main window
