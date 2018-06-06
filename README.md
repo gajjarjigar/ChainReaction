@@ -2,7 +2,15 @@
 
 Simple implementation of Chain Reaction Game in **Python 3**
 
-This is a 2 player game and grid can be customized
+This is a 2 player game and screen and grid can be customized in the code
+
+     # Screen Size
+     display_height = <value> 
+     display_width = <value>
+     
+     # Grid
+     rows = <value>
+     columns = <value>
 
 ## Prerequisite
 
