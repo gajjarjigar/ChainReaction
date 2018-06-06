@@ -1,5 +1,4 @@
 # ChainReaction
-Chain reaction implementation
 
 Simple implementation of Chain Reaction Game in **Python 3**
 
