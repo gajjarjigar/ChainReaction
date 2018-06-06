@@ -4,43 +4,51 @@ from tkinter import *
 from tkinter import messagebox
 import random
 
+# Initialization
 pygame.init()
+
+# Screen Size
 display_width = 600
 display_height = 600
+
+# Grid Size
 rows = 4
 columns = 4
+
+# Cell Size
 y_cell_size = int(display_height / rows)
 x_cell_size = int(display_width / columns)
-screen = pygame.display.set_mode((display_width, display_height))
-pygame.display.set_caption('Chain Reaction - Jigar Gajjar')
-fps_clock = pygame.time.Clock()
 # columns ==> x
 # rows ==> y
 
+# Show Screen
+screen = pygame.display.set_mode((display_width, display_height))
+pygame.display.set_caption('Chain Reaction - Jigar Gajjar')
+
+# For Animation
+fps_clock = pygame.time.Clock()
+
+# Players Turn Variable
 turn = 1
 
 
 class Color:
-    # Custom
-    shade = [(244, 67, 54), (0, 163, 232)]
-
-    # Standard
+    shade = [(244, 67, 54), (0, 163, 232)]  # shade[0] ==> Player 1,  shade[1] ==> Player2
     BLACK = (0, 0, 0)
-    WHITE = (255, 255, 255)
 
 
 class Cell:
     def __init__(self):
-        self.color = None
-        self.atoms = 0
-        self.neighbors = []
+        self.color = None  # Color of current cell
+        self.atoms = 0  # Number of atoms in the cell
+        self.neighbors = []  # Neighbors of this cell
 
-    def addNeighbors(self, x_index, y_index):
+    def add_neighbors(self, x_index, y_index):
+        # Merged the observations, we can write multiple if statements like y_index == 0  and x_index == 0 etc
         if y_index > 0:
             self.neighbors.append(Grid.grid[x_index][y_index - 1])
         if y_index < rows - 1:
             self.neighbors.append(Grid.grid[x_index][y_index + 1])
-
         if x_index > 0:
             self.neighbors.append(Grid.grid[x_index - 1][y_index])
         if x_index < columns - 1:
@@ -51,6 +59,7 @@ class Grid:
     grid = []
 
     def __init__(self):
+        # Make 2D Array for grid having Cell object in it
         for x in range(columns):
             grid_row = []
             for y in range(rows):
@@ -59,53 +68,55 @@ class Grid:
 
     @staticmethod
     def make(line_color):
+        # Clear Screen
         screen.fill(Color.BLACK)
+        # Draw Vertical Lines
         for i in range(columns):
             pygame.draw.line(screen, line_color, (i * x_cell_size, 0), (i * x_cell_size, y_cell_size * columns), 1)
+        # Draw Horizontal Lines
         for i in range(rows):
             pygame.draw.line(screen, line_color, (0, i * y_cell_size), (x_cell_size * rows, i * y_cell_size), 1)
 
     @staticmethod
+    def wobble(position):
+        xrandom = random.randint(1, 2) * random.choice([-1, 1])  # [1,2] * [1,-1]
+        yrandom = random.randint(1, 2) * random.choice([-1, 1])  # [1,2] * [1,-1]
+        position = (position[0] + xrandom, position[1] + yrandom)
+        return position
+
+    @staticmethod
     def draw_atoms():
+        # Iterate through grid array and display number of atoms
         for y in range(rows):
             for x in range(columns):
                 if Grid.grid[y][x].color:
-                    x_center = x * x_cell_size + int(x_cell_size / 2)
-                    y_center = y * y_cell_size + int(y_cell_size / 2)
-                    if Grid.grid[y][x].atoms == 1:
-                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        pygame.draw.circle(screen, Grid.grid[y][x].color, (x_center + xrandom, y_center + yrandom),
-                                           int(x_cell_size * 0.1))
-                    elif Grid.grid[y][x].atoms == 2:
-                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        pygame.draw.circle(screen, Grid.grid[y][x].color,
-                                           (x_center - int(x_cell_size * 0.1) + xrandom, y_center + yrandom),
-                                           int(x_cell_size * 0.1))
-                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        pygame.draw.circle(screen, Grid.grid[y][x].color,
-                                           (x_center + int(x_cell_size * 0.1) + xrandom, y_center + yrandom),
-                                           int(x_cell_size * 0.1))
-                    elif Grid.grid[y][x].atoms == 3:
-                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        pygame.draw.circle(screen, Grid.grid[y][x].color,
-                                           (x_center - int(x_cell_size * 0.1) + xrandom,
-                                            y_center - int(x_cell_size / 1.2 * 0.1) + yrandom),
-                                           int(x_cell_size * 0.1))
-                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        pygame.draw.circle(screen, Grid.grid[y][x].color,
-                                           (x_center + int(x_cell_size * 0.1) + xrandom,
-                                            y_center - int(x_cell_size / 1.2 * 0.1) + yrandom),
-                                           int(x_cell_size * 0.1))
-                        xrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        yrandom = random.randint(1, 2) * random.choice([-1, 1])
-                        pygame.draw.circle(screen, Grid.grid[y][x].color,
-                                           (x_center + xrandom, y_center + int(x_cell_size / 1.2 * 0.1) + yrandom),
-                                           int(x_cell_size * 0.1))
+
+                    color = Grid.grid[y][x].color
+                    radius = int(x_cell_size * 0.1)  # 10 % of cell size
+
+                    x_center = x * x_cell_size + int(x_cell_size / 2)  # X coordinate of center of Cell
+                    y_center = y * y_cell_size + int(y_cell_size / 2)  # Y coordinate of Center of Cell
+
+                    if Grid.grid[y][x].atoms == 1:  # if number of atoms = 1, make 1 filled circle
+                        position = Grid.wobble((x_center, y_center))
+                        pygame.draw.circle(screen, color, position, radius)  # Circle 1
+                    elif Grid.grid[y][x].atoms == 2:  # if number of atoms = 2, make 2 filled circles
+                        position = Grid.wobble((x_center - int(x_cell_size * 0.1), y_center))
+                        pygame.draw.circle(screen, color, position, radius)  # Circle 1
+
+                        position = Grid.wobble((x_center + int(x_cell_size * 0.1), y_center))
+                        pygame.draw.circle(screen, color, position, radius)  # Circle 2
+                    elif Grid.grid[y][x].atoms == 3:  # if number of atoms = 3, make 3 filled circles
+                        position = Grid.wobble(
+                            (x_center - int(x_cell_size * 0.1), y_center - int(x_cell_size / 1.2 * 0.1)))
+                        pygame.draw.circle(screen, color, position, radius)  # Circle 1
+
+                        position = Grid.wobble(
+                            (x_center + int(x_cell_size * 0.1), y_center - int(x_cell_size / 1.2 * 0.1)))
+                        pygame.draw.circle(screen, color, position, radius)  # Circle 2
+
+                        position = Grid.wobble((x_center, y_center + int(x_cell_size / 1.2 * 0.1)))
+                        pygame.draw.circle(screen, color, position, radius)  # Circle 3
 
 
 def toggle_turn():
@@ -114,17 +125,21 @@ def toggle_turn():
 
 
 def next_turn():
+    # Do not change turn variable's value
+    # Just return next players turn
     return 0 if turn == 1 else 1
 
 
 def burst(cell):
-    cell.atoms = 0
-    cell.color = None
+    cell.atoms = 0  # Make current cell empty
+    cell.color = None  # Make current cell's color blank
+
+    # Increment neighbor's value on burst
     for neighbor in cell.neighbors:
         neighbor.atoms = neighbor.atoms + 1
-        neighbor.color = Color.shade[turn]
+        neighbor.color = Color.shade[turn]  # Conquer neighbor color
     for neighbor in cell.neighbors:
-        if neighbor.atoms > 3:
+        if neighbor.atoms > 3:  # Recursive Burst
             burst(neighbor)
 
 
@@ -134,11 +149,12 @@ def check_winner():
     for y in range(rows):
         for x in range(columns):
             if Grid.grid[y][x].color:
-                if Grid.grid[y][x].color == Color.shade[turn]:
+                if Grid.grid[y][x].color == Color.shade[turn]:  # Check cell color with current players color and count
                     player1_score = player1_score + 1
                 else:
                     player2_score = player2_score + 1
 
+    # >=2 to check if it is not the start of the game
     if player1_score >= 2 and player2_score == 0:
         return turn
     elif player2_score >= 2 and player1_score == 0:
@@ -150,6 +166,7 @@ def check_winner():
 def add_atom(position):
     x = position[0]
     y = position[1]
+    # Normalize any point to index values
     x_index = int((x - (x - x_cell_size * int(x / x_cell_size))) / x_cell_size)
     y_index = int((y - (y - y_cell_size * int(y / y_cell_size))) / y_cell_size)
 
@@ -157,15 +174,22 @@ def add_atom(position):
     if Grid.grid[y_index][x_index].color == Color.shade[next_turn()]:
         return
 
+    # Else Add atom to the cell
     Grid.grid[y_index][x_index].atoms = Grid.grid[y_index][x_index].atoms + 1
     Grid.grid[y_index][x_index].color = Color.shade[turn]
-    if not Grid.grid[y_index][x_index].neighbors:
-        Grid.grid[y_index][x_index].addNeighbors(y_index, x_index)
 
+    # If there are no neighbors then add neighbors
+    if not Grid.grid[y_index][x_index].neighbors:
+        Grid.grid[y_index][x_index].add_neighbors(y_index, x_index)
+
+    # Condition to burst
     if Grid.grid[y_index][x_index].atoms > 3:
         burst(Grid.grid[y_index][x_index])
 
+    # After adding atom it is now other player's turn
     toggle_turn()
+
+    # ReDraw the addition of atoms and burst results
     Grid.make(Color.shade[turn])
     Grid.draw_atoms()
 
@@ -180,19 +204,18 @@ def event_handler():
 
 
 if __name__ == '__main__':
-    grid_object = Grid()
-    grid_object.make(Color.shade[turn])
+    Grid.make(Color.shade[turn])
     while True:
         fps_clock.tick(30)
         event_handler()
         pygame.display.update()
         result = check_winner()
-        if result == -1:
+        if result == -1:  # Game is still on!!!
             Grid.make(Color.shade[turn])
             Grid.draw_atoms()
             continue
         else:
-            Tk().wm_withdraw()  # to hide the main window
+            Tk().wm_withdraw()  # To hide the main window
             player = 'BLUE' if turn == 0 else 'RED'
             messagebox.showinfo('Game Over', 'Player {} Wins'.format(player))
             break
