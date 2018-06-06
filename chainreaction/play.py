@@ -8,12 +8,10 @@ import random
 pygame.init()
 
 # Screen Size
-display_width = 600
-display_height = 600
+display_width = display_height = 600
 
 # Grid Size
-rows = 4
-columns = 4
+rows = columns = 6
 
 # Cell Size
 y_cell_size = int(display_height / rows)
@@ -204,7 +202,7 @@ def event_handler():
 
 
 if __name__ == '__main__':
-    Grid.make(Color.shade[turn])
+    Grid().make(Color.shade[turn])
     while True:
         fps_clock.tick(30)
         event_handler()
